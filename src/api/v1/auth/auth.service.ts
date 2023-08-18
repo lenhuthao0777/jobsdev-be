@@ -1,26 +1,152 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { PrismaService } from 'src/lib/Prisma.service';
+import { TResponse } from 'src/types/globals.type';
+import { compare, hash } from 'bcrypt';
+import { saltOrRounds } from 'src/constants';
+import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(readonly prisma: PrismaService, private jwt: JwtService) {}
+  async create(createAuthDto: CreateAuthDto): Promise<TResponse<any>> {
+    try {
+      const user = await this.validateUser(createAuthDto.email);
+
+      if (user) {
+        return {
+          status: HttpStatus.CONFLICT,
+          data: user,
+          message: 'Account already exists!',
+        };
+      }
+
+      const hashPass = await hash(createAuthDto.password, saltOrRounds);
+
+      const res: User = await this.prisma.user.create({
+        data: {
+          firstName: createAuthDto.firstName,
+          lastName: createAuthDto.lastName,
+          email: createAuthDto.email,
+          password: hashPass,
+          roleId: createAuthDto.roleId,
+        },
+      });
+
+      return {
+        status: HttpStatus.CREATED,
+        data: {
+          id: res.id,
+          firstName: res.firstName,
+          lastName: res.lastName,
+          email: res.email,
+        },
+        message: 'Register account success!',
+      };
+    } catch (error) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error,
+      };
+    }
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async login(params: any): Promise<TResponse<any>> {
+    try {
+      const user: any = await this.validateUser(params.email);
+
+      if (!user) {
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'Email or Password is incorrect!',
+        };
+      }
+
+      const comparePass = await compare(params.password, user.password);
+
+      if (comparePass) {
+        const token = await this.createToken(params);
+
+        await this.prisma.user.update({
+          where: {
+            email: params.email,
+          },
+          data: {
+            accessToken: token,
+          },
+        });
+        return {
+          status: HttpStatus.OK,
+          data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user?.role,
+            accessToken: token,
+          },
+          message: 'Login success!',
+        };
+      }
+    } catch (error) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error,
+      };
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async findOne(email: string): Promise<TResponse<Omit<User, 'password'>>> {
+    try {
+      const res = await this.prisma.user.findFirst({
+        where: {
+          email,
+        },
+        include: {
+          role: true,
+          profile: true,
+        },
+      });
+
+      const { password, ...data } = res;
+
+      return {
+        status: HttpStatus.OK,
+        data: data,
+        message: 'Get user success!',
+      };
+    } catch (error) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error,
+      };
+    }
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async validateUser(email: string) {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          email,
+        },
+        include: {
+          role: true,
+        },
+      });
+
+      if (user) {
+        return user;
+      }
+
+      return null;
+    } catch (error) {
+      return error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async createToken(params: any) {
+    if (!params) return null;
+    const token = await this.jwt.signAsync(params);
+    return token;
   }
 }
