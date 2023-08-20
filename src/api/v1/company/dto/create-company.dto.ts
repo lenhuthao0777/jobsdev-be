@@ -1,4 +1,4 @@
-export class CreateProfileDto {
+export class CreateCompanyDto {
   firstName: string;
   lastName: string;
   headLine: string;
@@ -7,6 +7,7 @@ export class CreateProfileDto {
   region: string;
   city: string;
   contact: string;
+  companySize: string;
   summary: any;
   avatar: any;
   backgroundImage: any;

@@ -1,20 +1,25 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/lib/Prisma';
+import { UploadFile } from 'src/lib/Utils';
 import { TResponse } from 'src/types/globals.type';
-import { Role } from '@prisma/client';
 
 @Injectable()
-export class RoleService {
+export class FileService {
   constructor(readonly prisma: PrismaService) {}
-
-  async findAll(): Promise<TResponse<Role>> {
+  async create(file: File): Promise<TResponse<any>> {
     try {
-      const res: any = await this.prisma.role.findMany();
+      const data: any = await UploadFile(file);
+
+      const res: any = await this.prisma.file.create({
+        data: {
+          info: data,
+        },
+      });
 
       return {
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
         data: res,
-        message: 'Get role success!',
+        message: 'Upload file success!',
       };
     } catch (error) {
       return {
