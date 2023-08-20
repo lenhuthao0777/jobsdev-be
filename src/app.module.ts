@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 // Module
-import { PrismaService } from './lib/Prisma.service';
+import { PrismaService } from './lib/Prisma';
 import { AuthModule } from './api/v1/auth/auth.module';
 import { ProfileModule } from './api/v1/profile/profile.module';
 import { RoleModule } from './api/v1/role/role.module';

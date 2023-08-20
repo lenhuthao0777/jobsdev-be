@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { TResponse } from 'src/types/globals.type';
-import { PrismaService } from 'src/lib/Prisma.service';
+import { PrismaService } from 'src/lib/Prisma';
 import { CompanyProfile } from '@prisma/client';
 
 @Injectable()
@@ -14,6 +14,7 @@ export class CompanyService {
         data: {
           firstName: createCompanyDto.firstName,
           lastName: createCompanyDto.lastName,
+          headLine: createCompanyDto.headLine,
           region: createCompanyDto.region,
           city: createCompanyDto.city,
           summary: createCompanyDto.summary,
@@ -30,6 +31,23 @@ export class CompanyService {
         status: HttpStatus.CREATED,
         data: res,
         message: 'Create company success!',
+      };
+    } catch (error) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error,
+      };
+    }
+  }
+
+  async findAll(): Promise<TResponse<Array<CompanyProfile>>> {
+    try {
+      const res = await this.prisma.companyProfile.findMany();
+
+      return {
+        status: HttpStatus.OK,
+        data: res,
+        message: 'Get companies success!',
       };
     } catch (error) {
       return {
@@ -72,6 +90,7 @@ export class CompanyService {
         data: {
           firstName: updateCompanyDto.firstName,
           lastName: updateCompanyDto.lastName,
+          headLine: updateCompanyDto.headLine,
           region: updateCompanyDto.region,
           city: updateCompanyDto.city,
           summary: updateCompanyDto.summary,

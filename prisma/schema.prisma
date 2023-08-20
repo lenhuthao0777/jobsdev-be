@@ -50,6 +50,7 @@ model CompanyProfile {
   id              String   @id @default(uuid())
   firstName       String?
   lastName        String?
+  headLine        String?
   region          String?
   city            String?
   summary         String?

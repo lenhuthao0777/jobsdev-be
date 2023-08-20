@@ -1,26 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSkillDto } from './dto/create-skill.dto';
-import { UpdateSkillDto } from './dto/update-skill.dto';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { TResponse } from 'src/types/globals.type';
+import { Skill } from '@prisma/client';
+import { PrismaService } from 'src/lib/Prisma';
 
 @Injectable()
 export class SkillService {
-  create(createSkillDto: CreateSkillDto) {
-    return 'This action adds a new skill';
-  }
+  constructor(readonly prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all skill`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} skill`;
-  }
-
-  update(id: number, updateSkillDto: UpdateSkillDto) {
-    return `This action updates a #${id} skill`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} skill`;
+  async findAll(): Promise<TResponse<Array<Skill>>> {
+    try {
+      const res = await this.prisma.skill.findMany();
+      return {
+        status: HttpStatus.OK,
+        data: res,
+        message: 'Get skills success!',
+      };
+    } catch (error) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error,
+      };
+    }
   }
 }

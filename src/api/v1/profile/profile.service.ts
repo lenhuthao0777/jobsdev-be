@@ -1,8 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+
 import { TResponse } from 'src/types/globals.type';
-import { PrismaService } from 'src/lib/Prisma.service';
+import { PrismaService } from 'src/lib/Prisma';
 import { Profile } from '@prisma/client';
 
 @Injectable()

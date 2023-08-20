@@ -1,16 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
-import { PrismaService } from 'src/lib/Prisma.service';
+import { PrismaService } from 'src/lib/Prisma';
 import { TResponse } from 'src/types/globals.type';
 import { Role } from '@prisma/client';
 
 @Injectable()
 export class RoleService {
   constructor(readonly prisma: PrismaService) {}
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
-  }
 
   async findAll(): Promise<TResponse<Role>> {
     try {

@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/lib/Prisma.service';
+import { PrismaService } from 'src/lib/Prisma';
 import { UploadFile } from 'src/lib/Utils';
 import { TResponse } from 'src/types/globals.type';
 

@@ -1,11 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+
+//
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { PrismaService } from 'src/lib/Prisma.service';
 import { TResponse } from 'src/types/globals.type';
 import { compare, hash } from 'bcrypt';
 import { saltOrRounds } from 'src/constants';
-import { User } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/lib/Prisma';
 
 @Injectable()
 export class AuthService {
@@ -105,6 +107,7 @@ export class AuthService {
         include: {
           role: true,
           profile: true,
+          CompanyProfile: true,
         },
       });
 
