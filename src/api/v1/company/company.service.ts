@@ -3,7 +3,6 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { TResponse } from 'src/types/globals.type';
 import { PrismaService } from 'src/lib/Prisma';
-import { CompanyProfile } from '@prisma/client';
 
 @Injectable()
 export class CompanyService {
@@ -40,7 +39,7 @@ export class CompanyService {
     }
   }
 
-  async findAll(): Promise<TResponse<Array<CompanyProfile>>> {
+  async findAll(): Promise<TResponse<Array<any>>> {
     try {
       const res = await this.prisma.companyProfile.findMany();
 
@@ -57,7 +56,7 @@ export class CompanyService {
     }
   }
 
-  async findOne(id: string): Promise<TResponse<CompanyProfile>> {
+  async findOne(id: string): Promise<TResponse<any>> {
     try {
       const res = await this.prisma.companyProfile.findFirst({
         where: {

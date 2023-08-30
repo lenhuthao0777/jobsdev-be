@@ -4,7 +4,6 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 import { TResponse } from 'src/types/globals.type';
 import { PrismaService } from 'src/lib/Prisma';
-import { Profile } from '@prisma/client';
 
 @Injectable()
 export class ProfileService {
@@ -12,7 +11,7 @@ export class ProfileService {
 
   async create(createProfileDto: CreateProfileDto): Promise<TResponse<any>> {
     try {
-      const res: Profile = await this.prisma.profile.create({
+      const res: any = await this.prisma.profile.create({
         data: {
           firstName: createProfileDto.firstName,
           lastName: createProfileDto.lastName,
