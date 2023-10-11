@@ -1,11 +1,6 @@
-import {
-  Controller,
-  Post,
-  UseInterceptors,
-  UploadedFile,
-} from '@nestjs/common';
-import { FileService } from './file.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Post, UseInterceptors, UploadedFile } from '@nestjs/common'
+import { FileService } from './file.service'
+import { FileInterceptor } from '@nestjs/platform-express'
 
 @Controller('api/v1/file')
 export class FileController {

@@ -36,14 +36,16 @@ model Profile {
   city            String?
   summary         String?
   industry        String?
-  avatar          Json?
-  backgroundImage Json?
+  avatar          String?
+  backgroundImage String?
   contact         String?
   content         Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String   @unique
+
+  @@index([userId])
 }
 
 model CompanyProfile {
@@ -57,13 +59,15 @@ model CompanyProfile {
   industry        String?
   companySize     String?
   contact         String?
-  avatar          Json?
-  backgroundImage Json?
+  avatar          String?
+  backgroundImage String?
   content         Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String   @unique
+
+  @@index([userId])
 }
 
 model Role {
@@ -73,13 +77,6 @@ model Role {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User[]
-}
-
-model File {
-  id        String   @id @default(uuid())
-  info      Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Skill {
@@ -102,7 +99,7 @@ model Job {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   userId       String
-  user         User         @relation(fields: [userId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   SkillOnJob   SkillOnJob[]
 }
 
@@ -113,4 +110,6 @@ model SkillOnJob {
   skillId String
 
   @@id([jobId, skillId])
+  @@index([jobId])
+  @@index([skillId])
 }
