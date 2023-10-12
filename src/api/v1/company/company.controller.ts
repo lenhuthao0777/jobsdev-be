@@ -11,8 +11,9 @@ import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { BASE_URL_API } from 'src/constants';
 
-@Controller('api/v1/company')
+@Controller(`${BASE_URL_API}/company`)
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 

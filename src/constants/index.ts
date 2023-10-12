@@ -1,5 +1,7 @@
 export const saltOrRounds = 10;
 
+export const BASE_URL_API = 'api/v1'
+
 export const roles = [
   {
     name: 'ADMIN',

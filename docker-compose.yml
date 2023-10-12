@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  api:
+    stdin_open: true
+    tty: true
+    build:
+      dockerfile: Dockerfile
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    env_file:
+    - .env
+    environment:
+    - DATABASE_URL=postgresql://postgres:@jobsdev0777@db.vzdxcyogpjlvhqpbtmxf.supabase.co:5432/postgres
+    - PORT=8080
+    - JWT_SECRET=jwt_secret
+    - JWT_EXPIRESIN=3600S
+    - CLOUD_NAME= dyg39hfua
+    - API_KEY=455959399289675
+    - API_SECRET=WyPmNsOwtOT4woua5A0p6cinZ24
+    # Run a command against the development stage of the image
+    command: npm run dev
+    ports:
+      - 8080:8080

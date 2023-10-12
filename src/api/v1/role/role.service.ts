@@ -1,13 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/lib/Prisma';
 import { TResponse } from 'src/types/globals.type';
-import { Role } from '@prisma/client';
 
 @Injectable()
 export class RoleService {
   constructor(readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<TResponse<Role>> {
+  async findAll(): Promise<TResponse<any>> {
     try {
       const res: any = await this.prisma.role.findMany();
 

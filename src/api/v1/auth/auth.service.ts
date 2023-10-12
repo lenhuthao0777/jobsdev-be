@@ -1,32 +1,33 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 
 //
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { TResponse } from 'src/types/globals.type';
-import { compare, hash } from 'bcrypt';
-import { saltOrRounds } from 'src/constants';
-import { PrismaService } from 'src/lib/Prisma';
+import { CreateAuthDto } from './dto/create-auth.dto'
+import { TResponse } from 'src/types/globals.type'
+import { compare, hash } from 'bcrypt'
+import { saltOrRounds } from 'src/constants'
+import { PrismaService } from 'src/lib/Prisma'
 
 @Injectable()
 export class AuthService {
   constructor(readonly prisma: PrismaService, private jwt: JwtService) {}
   async create(createAuthDto: CreateAuthDto): Promise<TResponse<any>> {
     try {
-      const user = await this.validateUser(createAuthDto.email);
+      const user = await this.validateUser(createAuthDto.email)
 
       if (user) {
-        return {
-          status: HttpStatus.CONFLICT,
-          data: user,
-          message: 'Account already exists!',
-        };
+        throw new ConflictException('Account already exists!')
       }
 
-      const hashPass = await hash(createAuthDto.password, saltOrRounds);
+      const hashPass = await hash(createAuthDto.password, saltOrRounds)
 
-      const res: User = await this.prisma.user.create({
+      const res: any = await this.prisma.user.create({
         data: {
           firstName: createAuthDto.firstName,
           lastName: createAuthDto.lastName,
@@ -34,7 +35,7 @@ export class AuthService {
           password: hashPass,
           roleId: createAuthDto.roleId,
         },
-      });
+      })
 
       return {
         status: HttpStatus.CREATED,
@@ -45,30 +46,27 @@ export class AuthService {
           email: res.email,
         },
         message: 'Register account success!',
-      };
+      }
     } catch (error) {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: error,
-      };
+      }
     }
   }
 
-  async login(params: any): Promise<TResponse<any>> {
+  async login(params: any) {
     try {
-      const user: any = await this.validateUser(params.email);
+      const user: any = await this.validateUser(params.email)
 
       if (!user) {
-        return {
-          status: HttpStatus.BAD_REQUEST,
-          message: 'Email or Password is incorrect!',
-        };
+        throw new BadRequestException('Email or Password is incorrect!')
       }
 
-      const comparePass = await compare(params.password, user.password);
+      const comparePass = await compare(params.password, user.password)
 
       if (comparePass) {
-        const token = await this.createToken(params);
+        const token = await this.createToken(params)
 
         await this.prisma.user.update({
           where: {
@@ -77,7 +75,7 @@ export class AuthService {
           data: {
             accessToken: token,
           },
-        });
+        })
         return {
           status: HttpStatus.OK,
           data: {
@@ -88,17 +86,14 @@ export class AuthService {
             accessToken: token,
           },
           message: 'Login success!',
-        };
+        }
       }
     } catch (error) {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error,
-      };
+      throw new InternalServerErrorException(error)
     }
   }
 
-  async findOne(email: string): Promise<TResponse<Omit<User, 'password'>>> {
+  async findOne(email: string): Promise<TResponse<any>> {
     try {
       const res = await this.prisma.user.findFirst({
         where: {
@@ -109,20 +104,17 @@ export class AuthService {
           profile: true,
           CompanyProfile: true,
         },
-      });
+      })
 
-      const { password, ...data } = res;
+      const { password, ...data } = res
 
       return {
         status: HttpStatus.OK,
         data: data,
         message: 'Get user success!',
-      };
+      }
     } catch (error) {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error,
-      };
+      throw new InternalServerErrorException(error)
     }
   }
 
@@ -135,21 +127,21 @@ export class AuthService {
         include: {
           role: true,
         },
-      });
+      })
 
       if (user) {
-        return user;
+        return user
       }
 
-      return null;
+      return null
     } catch (error) {
-      return error;
+      return error
     }
   }
 
   async createToken(params: any) {
-    if (!params) return null;
-    const token = await this.jwt.signAsync(params);
-    return token;
+    if (!params) return null
+    const token = await this.jwt.signAsync(params)
+    return token
   }
 }
